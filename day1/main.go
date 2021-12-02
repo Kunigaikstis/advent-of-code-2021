@@ -1,45 +1,25 @@
 package main
 
 import (
-	"bufio"
-	"errors"
 	"fmt"
-	"io"
+	"github.com/Kunigaikstis/advent-of-code-2021/utils"
 	"math"
-	"os"
-	"strconv"
-	"strings"
 	"sync/atomic"
 )
 
 func main() {
-	f, err := os.Open("day1/input.txt")
+	nums, err := utils.ReadNumsFromFile("day1/input.txt")
 	if err != nil {
 		panic(err)
 	}
 
-	defer f.Close()
-	r := bufio.NewReader(f)
+	fmt.Println(part1(nums))
+	fmt.Println(part2(nums))
+}
 
+func part1(nums []int) int32 {
 	var count int32
 	prev := math.MaxInt
-	var done bool
-	var nums []int
-
-	for !done {
-		input, err := r.ReadString('\n')
-		if errors.Is(io.EOF, err) {
-			done = true
-		}
-
-		num, err := strconv.Atoi(strings.TrimSpace(input))
-		if err != nil {
-			panic(err)
-		}
-
-		nums = append(nums, num)
-	}
-
 	for _, num := range nums {
 		if num > prev {
 			atomic.AddInt32(&count, 1)
@@ -48,5 +28,22 @@ func main() {
 		prev = num
 	}
 
-	fmt.Println(count)
+	return count
+}
+
+// a + b + c < b + c + d == a < d
+func part2(nums []int) int32 {
+	var count int32
+	maxLength := len(nums) - 1
+	for i := range nums {
+		if i+3 > maxLength {
+			continue
+		}
+
+		if nums[i+3] > nums[i] {
+			atomic.AddInt32(&count, 1)
+		}
+	}
+
+	return count
 }
